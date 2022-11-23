@@ -1,0 +1,611 @@
+<!DOCTYPE HTML>
+
+<html>
+   <head>
+      <title>DU-ASSISTANT</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+      <link rel="stylesheet" href="assets/css/main.css" />
+      <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+   </head>
+   <body class="is-preload">
+
+      <!-- Wrapper -->
+         <div id="wrapper">
+
+            <!-- Header -->
+               <header id="header">
+                  
+				  <div class="mainlogo"><img src="images/dlogo.png" width="80" height="80"></div>
+                  <div class="content">
+                     <div class="inner">
+                        <h1>DU-ASSISTANT</h1>
+                        <h4>당신의 인공지능 학습 도우미</h4>
+                     </div>
+                  </div>
+                  <nav>
+                     <ul>
+                        <li><a href="#intro">Study</a></li>
+                        <!-- <li><a href="#index2.html + s_time">aa</a></li> -->
+                       
+                        <!--<li><a href="#elements">Elements</a></li>-->
+                     </ul>
+                  </nav>
+               </header>
+
+            <!-- Main -->
+               <div id="main">
+
+                  <!-- Intro -->
+                     <article id="intro">
+                        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>@import url(style.css);</style>
+</head>
+<body>
+   <div style="color:rgb(255, 255, 255);">DU-ASSISTANT</div>
+    
+    <form style="color:rgb(255, 255, 255);"> 
+      
+        목표시간 :<input type="text" style="color:rgb(255, 255, 255);" id="r_time" placeholder="분 단위로 입력하시오.">
+                  <input type="button" value="+30M" onclick="++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;++this.form.r_time.value;">
+                  <input type="button" value="-30M" onclick="--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;--this.form.r_time.value;">
+         
+                  <br><br>
+        <button type="button" onclick="Check()">Start</button>
+        <button type="button" onclick="stop()">Stop</button>
+        <!-- <button type="button" onclick="MyPage()">MyPage</button> -->
+        <button type="button" onclick="Memo()">PLANNER</button>
+        <button type="button" onclick="initialization()">Reset</button>
+       
+    </form>
+    <div id="webcam-container"></div>
+    <div id="label-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <script type="text/javascript">
+        var s_time=0;
+       // var s_m_time = 0; //분 단위 변수
+        var o_time=0;
+        var p_time=0;
+        var ap_time=0;
+        var sum=0;
+        var overlap = 0;  
+       
+        const URL = "./my_model/";
+        
+        let model, webcam, labelContainer, maxPredictions;
+        function Check(){
+         var getTime =  document.getElementById('r_time').value;
+
+
+            if(overlap == 1){
+             alert("카메라가 켜져있습니다.");
+               return false;
+            }
+
+            if(getTime==""||getTime==0||getTime<0){
+               alert("1분이상 입력하세요.");
+               return false;
+            }
+            else if((getTime >='a' && getTime<='z')||(getTime>='ㄱ'&&getTime<='ㅎ')||(getTime>='ㅏ'&&getTime<='ㅣ')||(getTime>='가'&&getTime<='힣')||(getTime=='.')){
+               alert("시간을 입력하세요.");
+               return false;
+            }            
+            else{
+               init();  
+            }
+         }
+
+
+        // Load the image model and setup the webcam
+        async function init() {
+           overlap++;
+            r_time = document.getElementById("r_time").value;
+           
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+    
+            // load the model and metadata
+            // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+            // or files from your local hard drive
+            // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+    
+            // Convenience function to setup a webcam
+            const flip = true; // whether to flip the webcam
+            webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+            await webcam.setup(); // request access to the webcam
+            await webcam.play();
+            window.requestAnimationFrame(loop);
+            // append elements to the DOM
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
+            labelContainer = document.getElementById("label-container");
+            for (let i = 0; i < maxPredictions; i++) { // and class labels
+                labelContainer.appendChild(document.createElement("div"));
+            }
+            
+        }
+        
+        async function loop() {
+            webcam.update(); // update the webcam frame
+            await predict();
+            window.requestAnimationFrame(loop);
+        }
+
+        async function MyPage() {
+            location.href='index2.html?' + s_time;
+        }
+        
+        async function Memo() {
+            
+           
+            location.href='toDoList.html?' + s_time;
+            
+        }
+    
+        var famous = new Array('할 수 있는 자는 행한다. 할 수 없는 자는 가르친다.\n - 조지 버나드',
+        '교육의 목적은 비어 있는 머리를 열려 있는 머리로 바꾸는 것이다.\n - 말콤 포브스',
+        '자유와 정의 다음으로 중요한 것은 대중 교육인데, 대중 교육 없이는 자유도 정의도 영원히 유지될 수 없다.\n - 제임스 A. 가필드',
+        '남의 말을 따라하기 위해서는 교육이 필요하다. 그 말에 도전하기 위해서는 두뇌가 필요하다.\n - 메리 페티본 풀',
+        '젊었을 때 배움을 게을리 한 사람은 과거를 상실하며 미래도 없다.\n - 에우리피데스',
+        '많이 보고 많이 겪고 많이 공부하는 것은 배움의 세 기둥이다.\n - 벤자민 디즈라엘리',
+        '어떤 생각에 동의하지 않고도 그 생각을 해볼 수 있는 것이 교육받은 사람의 특징이다.\n - 아리스토텔레스',
+        '행동의 가치는 그 행동을 끝까지 이루는 데 있다.\n - 칭기즈칸',
+        '너무 소심하고 까다롭게 자신의 행동을 고민하지 말라. 모든 인생은 실험이다. 더 많이 실험할 수록 더 나아진다.\n - 랄프 왈도 에머슨',
+        '훈련이 전부다. 복숭아도 한때는 쓴 씨앗이었고, 대학교육을 받으면 꽃배추도 양배추에 불과하다.\n - 마크 트웨인',
+        '배움이란 일생동안 알고 있었던 것을 어느 날 갑자기 완전히 새로운 방식으로 이해하는 것이다.\n - 도리스 레싱',
+        '교육을 무시하는 것은 무지한 사람뿐이다.\n - 퍼블릴리어스 사이러스',
+        '많은 공부와 지식이 곧 지혜로 연결되는 것은 아니다.\n - 헤라클레이토스',
+        '지식을 얻으려면 공부를 해야 하고, 지혜를 얻으려면 관찰을 해야 한다.\n - 마릴린 보스 사번트',
+        '개인적으로 나는 언제나 배울 준비가 되어 있지만 가르침 받는 것을 항상 좋아하는 것은 아니다.\n - 윈스턴 처칠',
+        '어느 국가든 그 기초는 젊은이들의 교육이다.\n - 디오게네스 라에르티오스',
+        '당신이 젊은 시절 꿈꾸었던 것에 충실하라.\n - 프리드리히 실러',
+        '못 가진 것에 대한 욕망으로 가진 것을 망치지 말라. 하지만 지금 가진 것이 한때는 바라기만 했던 것 중 하나였다는 것도 기억하라.\n - 에피쿠로스',
+        '욕구란 성취에 대한 생각이 동반될 때 희망이라 불린다. 같은 욕구에 이러한 생각이 없다면 이는 절망이다.\n - 토마스 훕스',
+        '인간은 양도할 수 없는 자기 계발 권리를 지닌다.\n - 저메인 그리어',
+        '삶이 있는 한 희망은 있다.\n - 키케로',
+        '희망을 품지 않은 자는 절망도 할 수 없다.\n - 조지 버나드 쇼',
+        '어떤 일을 하기에 앞서 스스로 그 일에 대한 기대를 가져야 한다.\n - 마이클 조던',
+        '희망은 날개 달린 것, 영혼에 내려앉아 가사 없는 노래 부르네. 그치지 않는 그 노래.\n - 에밀리 디킨스',
+        '위대한 성취를 하려면 행동하는 것뿐만 아니라, 꿈꾸는 것도 반드시 필요하다.\n - 아나톨 프랑스',
+        '큰 희망이 큰 사람을 만든다.\n - 토마스 풀러',
+        '삶의 핵심은, 그것도 긍정주의자로 사는 삶의 핵심은 아직 최상의 미래가 도래하지 않았다고 믿을 정도로 순진해지는 것이다.\n - 헤브록 엘리스',
+        '만일 내게 나무를 베기 위해 한 시간만 주어진다면, 우선 나는 도끼를 가는데 45분을 쓸 것이다.\n - 에이브러햄 링컨',
+        '아무 하는 일 없이 시간을 허비하지 않겠다고 맹세하라. 우리가 항상 뭔가를 한다면 놀라우리만치 많은 일을 해낼 수 있다.\n - 토마스 제퍼슨',
+        '당신의 노력을 존중하라. 당신 자신을 존중하라. 자존감은 자제력을 낳는다. 이 둘을 모두 겸비하면, 진정한 힘을 갖게 된다.\n - 클린트 이스트우드',
+        '걷기는 잊혀진 기술이 아니다. 누구라도 어쨌든 차고까지는 걸어가야 한다.\n - 에반 에사르',
+        '품질이란 우연히 만들어지는 것이 아니라, 언제나 지적 노력의 결과이다.\n - 존 러스킨',
+        '나는 전투를 준비하면서 계획은 무용하나 계획하는 것은 꼭 필요함을 항상 발견해왔다.\n - 드와이트 데이비드 아이젠하워',
+        '제우스신은 모든 인간의 계획을 성취시키지 않는다.\n - 호메로스',
+        '게으름은 피곤하기 전에 쉬는 습관일 뿐.\n - 쥘 르나르',
+        '우리가 하는 일은 바다에 붓는 한 방울의 물보다 하찮은 것이다. 하지만 그 한 방울이 없다면 바다는 그만큼 줄어들 것이다.\n - 마더 테레사',
+        '혁명은 다 익어 저절로 떨어지는 사과가 아니다. 떨어뜨려야 하는 것이다.\n - 체 게바라',
+        '지성을 다하는 것이 곧 천도(天道)다\n - 맹자',
+        '개선이란 무언가가 좋지 않다고 느낄 수 있는 사람들에 의해서만 만들어질 수 있다.\n - 프레드리히 니체',
+        '나약한 태도는 성격도 나약하게 만든다.\n - 알버트 아인슈타인',
+        '티끌 모아 태산\n - 공자',
+        '불 켜는 것만 잊지 않으면 가장 어두운 시간에도 행복을 찾을 수 있습니다.\n - 알버스 덤블도어',
+        '구르는 돌엔 이끼가 끼지 않는다.\n - 격언',
+        '눈앞의 실패에 좌절하지 않을 수 있는 장기 목표를 반드시 가지고 있어야 한다.\n - 찰스 C.노블',
+        '실패하는 게 두려운게 아니라 노력하지 않는 게 두렵다.\n - 마이클 조던',
+        '성공이 그렇게 달콤한 것은 결코 성공하지 못한 사람들이 있기 때문이다.\n - 에밀리 디킨스',
+        '만약, 우리가 우리의 꿈들을 쫓을 용기만 있다면 그 꿈들은 반드시 이루어진다.\n - 윌트 디즈니',
+        '우리를 더욱 강하고 단단하게 만들어 준다.\n - 괴테',
+        '늘 명심하라 성공하겠다는 너 자신의 결심이 다른 어떤 것보다 중요하다는 것을.\n - 에이브러햄 링컨',
+        '걱정없는 인생을 만나지 말고 걱정에 물들지 않는 연습을 하라.\n - 알랭',
+        '절대 어제를 후회하지 마라. 인생은 오늘의 나 안에 있고 내일은 스스로 만드는 것이다.\n - L.론허바드',
+        '부정적인 사람은 한 게 없고 긍정적인 사람은 한계가 없다.\n - 안대장',
+        '행운은 100퍼센트 노력한 뒤에 남는 것이다.\n - 랭스터 콜만',
+        '이루어질 가능성이 없었다면 애초에 자연이 우리를 꿈꾸게 하지도 않았을 것이다.\n - 존 업다이크',
+        '노력을 이기는 재능은 없고, 노력을 외면하는 결과도 없다.\n - 이창호',
+        '집중력은 자신감과 갈망이 결합하여 생기는 것이다.\n - 아놀드 파머',
+        '시간은 환상이다. 점심시간은 두배로 그렇다.\n - 더글러스 애덤스',
+        '할 수 있는 것만 한다면 발전할 수 없어\n - 영화 <쿵푸팬더>',
+        '나는 이룰 때까지 노력할 것이다.\n - 브라이언 트레이시',
+        '지옥을 걷고 있다면, 계속해서 걸어가라.\n - 윈스턴 처칠',
+        '무슨 생각을 하느냐가 어떤 사람이 되는 지를 결정한다.\n - 오프라 원프리',
+        '믿음이 부족하기 때문에 도전하길 두려워하는 바, 나는 스스로를 믿는다.\n - 무하마트 알리',
+        '꿈을 꿀수 있다면 행동할 수 있고, 행동할 수 있다면 원하는 대로 될 수 있다.\n -브라이언 트레이시',
+        '위대한 것으로 향하기 위해 좋은 것을 포기하는 걸 두려워하지 마라.\n - 존 록펠러',
+        '성공은 매일 반복한 작은 노력들의 합이다.\n - 로버트 클리어',
+        '미래를 두려워 하는 것은 현재를 낭비하는 것이다.\n - 존 메이슨',
+        '실패하는 사람들의 90%는 정말로 패배하는 것이 아니라 포기하는 것이다.\n - 폴 J.마이어',
+        '작은 성공부터 시작하라. 성공에 익숙해지면 무슨 목표든 할 수 있다.\n - 데일 카네기',
+        '인생은 누가 1등을 하는지 따지는 경기가 아니라, 얼마나 의미있고 행복했는 지가 중요하다.\n - 마틴 루터 킹',
+        '포기해야겠다는 생각이 들 때야 말로 성공에 가까워진 때이다.\n - 밥 파슨스',
+        '우리의 인생은 우리가 노력한 만큼 가치가 있다.\n - 모리악',
+        '쉽고 평안한 환경에선 강한 인간이 만들어지지 않는다.\n - 헬렌 켈러',
+        '승리는 가장 끈기있는 사람에게 돌아간다.\n - 나폴레옹',
+        '가치있는 목표를 향한 움직임을 개시하는 순간 당신의 성공은 시작된다.\n - 찰스 칼슨',
+        '뜨거운 열정보다 더 중요한 것은 바로 지속적인 열정이다.\n - 마크 저커버그',
+        '최고의 경쟁력은 열정이다.\n - 잭 웰치',
+        '나는 10번 시도하면 9번 실패했다. 그래서 10번씩 시도했다.\n - 조지 버나드 쇼',
+        '독서실에 마지막까지 남아 공부를 한다. 참 웃기는 일이었다. 내가 제일 공부를 잘하는데, 내가 제일 열심히한다.\n - 서울대 의예과 수석합격자의 글 중',
+        '당신이 뛸 경우. 당신은 질지도 모른다. 만약 뛰지 않는다면. 당신은 확실히 진다.\n - 제시 잭슨',
+        '절실하지 않은 자는 꿈을 꿀 수 없다.\n - 플라톤',
+        '가장 위대한 영광은 한 번도 실패하지 않음이 아니라, 실패할 때마다 다시 일서는 데에 있다.\n - 공자',
+        '또 실패했는가? 괜찮다. 다시 실행하라. 그리고 더 나은 실패를 하라.\n - 사무엘 베케트',
+        '낭비한 시간에 대한 후회는 더 큰 시간 낭비이다.\n - 메이슨 쿨리',
+        '기초가 없으면, 계단을 오를 수 없다. 기초없는 성취는 오르는 것이 아니라 바닥으로 떨어지는 것이다.\n - tvN드라마<미생>',
+        '때가 되면 마땅히 스스로 공부에 힘써야 하며 세월은 사람을 기다리지 않는다.\n - 도연명',
+        '배우고 때때로 익히면, 또한 즐겁지 아니한가?\n - 공자',
+        '배우지 않으면, 곧 늙고 쇠해진다.\n - 주자',
+        '니 성적에 그만두려고..?\n - 김근영',
+        '몸은 아파도 마음은 아프지말라.\n - 장현진',
+        '잠은 죽고나서\n - 이영석',
+        '이건 시험에 안나오겠지. 문제 출제 니가 하니?\n - 박정윤',
+        );
+        //랜덤함수에 쓰일 배열 선언 
+        function StopCheck(a){
+            return a[Math.floor(Math.random()*a.length)];
+        }//배열 갯수 만큼 중 하나로 랜덤으로 뽑아 하나를 반환 
+
+        async function stop(a) {//confirm에 해당 함수호출 + 문구출력
+            //stopcheck함수에 배열 famous를 넣어 랜덤으로 출력
+            if(overlap==0){
+               alert("카메라가 꺼져있습니다.");
+               return false;
+            }
+            if(confirm(StopCheck(famous)+ "\n\n그만두시겠습니까?")) {
+            location.href='toDoList.html?'+s_time;
+            overlap--;
+            }
+            else{
+                alert("다시 이어서 시작합니다.");
+            }
+            
+        }
+
+        async function initialization() {
+            if(confirm("초기화 시키겠습니까?")) {
+                localStorage.setItem("all_time", 0);
+                alert("초기화 하였습니다.");
+               }
+                else{
+                    alert("초기화 시키지않습니다.");
+                }
+        }
+
+        function audio(){
+         const myAudio = new Audio();
+         myAudio.src = "./Study.mp3";
+         myAudio.volume = 0.1;
+
+         myAudio.play();
+         ap_time = 0;
+        }
+       
+
+        function sleep(sec) { return new Promise(resolve => setInterval(resolve, sec * 1000)); } // 1초 대기
+
+        // run the webcam image through the image model
+        async function predict() {
+            // predict can take in an image, video or canvas html element
+            const prediction = await model.predict(webcam.canvas);
+           for(let i=0;i<maxPredictions;i++){
+               const classPrediction=prediction[i].className+prediction[i].probability.toFixed(2);
+               labelContainer.childNodes[i].innerHTML= classPrediction ;
+            }
+            if(prediction[0].className == "공부" && prediction[0].probability.toFixed(2) >= 0.8){
+               ap_time = 0;
+
+                s_time = s_time + 1;
+                await sleep(1);
+                /*labelContainer.childNodes[0].innerHTML = "<div style='color:white'>공부</div>"*/
+
+            }
+            if(prediction[1].className == "공부 외적 행동" && prediction[1].probability.toFixed(2) >= 0.8){
+                p_time = p_time + 1;
+                ap_time = ap_time + 1;
+                await sleep(1);
+                /*labelContainer.childNodes[0].innerHTML = "<div style='color:white'>공부 외적 행동</div>"*/
+
+                if(ap_time == 10){
+                  audio();
+                  labelContainer.childNodes[0].innerHTML = "<div style='color:white'>공부에 집중하세요!!</div>"
+                }
+               
+            }
+            if(prediction[2].className == "자리비움" && prediction[2].probability.toFixed(2) == 1.00){
+               ap_time = 0; 
+
+               o_time = o_time + 1;
+                await sleep(1);
+                /*labelContainer.childNodes[0].innerHTML = "<div style='color:white'>자리비움</div>"*/
+            }
+          
+           if (s_time == r_time){
+            sum = s_time + p_time + o_time;
+            alert("공부시간: "+s_time + "분" + "\n딴짓: " + p_time + "분" + "\n자리비움: " + o_time + "분" +  "\n\n총 시간: " + sum + "분");
+            location.href="toDoList.html?"+s_time;
+
+            webcam.stop();
+            }
+           
+        }
+        localStorage.getItem(s_time);
+    </script>
+   
+</body>
+</html>
+                     </article>
+
+                  
+
+                  <!-- Contact -->
+                     <article id="contact">
+                        
+
+
+                     </article>
+
+                  <!-- Elements -->
+                     <article id="elements">
+                        <h2 class="major">Elements</h2>
+
+                        <section>
+                           <h3 class="major">Text</h3>
+                           <p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is <em>emphasized</em>.
+                           This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
+                           This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a href="#">this is a link</a>.</p>
+                           <hr />
+                           <h2>Heading Level 2</h2>
+                           <h3>Heading Level 3</h3>
+                           <h4>Heading Level 4</h4>
+                           <h5>Heading Level 5</h5>
+                           <h6>Heading Level 6</h6>
+                           <hr />
+                           <h4>Blockquote</h4>
+                           <blockquote>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan faucibus. Vestibulum ante ipsum primis in faucibus lorem ipsum dolor sit amet nullam adipiscing eu felis.</blockquote>
+                           <h4>Preformatted</h4>
+                           <pre><code>i = 0;
+
+while (!deck.isInOrder()) {
+    print 'Iteration ' + i;
+    deck.shuffle();
+    i++;
+}
+
+print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
+                        </section>
+
+                        <section>
+                           <h3 class="major">Lists</h3>
+
+                           <h4>Unordered</h4>
+                           <ul>
+                              <li>Dolor pulvinar etiam.</li>
+                              <li>Sagittis adipiscing.</li>
+                              <li>Felis enim feugiat.</li>
+                           </ul>
+
+                           <h4>Alternate</h4>
+                           <ul class="alt">
+                              <li>Dolor pulvinar etiam.</li>
+                              <li>Sagittis adipiscing.</li>
+                              <li>Felis enim feugiat.</li>
+                           </ul>
+
+                           <h4>Ordered</h4>
+                           <ol>
+                              <li>Dolor pulvinar etiam.</li>
+                              <li>Etiam vel felis viverra.</li>
+                              <li>Felis enim feugiat.</li>
+                              <li>Dolor pulvinar etiam.</li>
+                              <li>Etiam vel felis lorem.</li>
+                              <li>Felis enim et feugiat.</li>
+                           </ol>
+                           <h4>Icons</h4>
+                           <ul class="icons">
+                              <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+                              <li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+                              <li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+                              <li><a href="#" class="icon brands fa-github"><span class="label">Github</span></a></li>
+                           </ul>
+
+                           <h4>Actions</h4>
+                           <ul class="actions">
+                              <li><a href="#" class="button primary">Default</a></li>
+                              <li><a href="#" class="button">Default</a></li>
+                           </ul>
+                           <ul class="actions stacked">
+                              <li><a href="#" class="button primary">Default</a></li>
+                              <li><a href="#" class="button">Default</a></li>
+                           </ul>
+                        </section>
+
+                        <section>
+                           <h3 class="major">Table</h3>
+                           <h4>Default</h4>
+                           <div class="table-wrapper">
+                              <table>
+                                 <thead>
+                                    <tr>
+                                       <th>Name</th>
+                                       <th>Description</th>
+                                       <th>Price</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <tr>
+                                       <td>Item One</td>
+                                       <td>Ante turpis integer aliquet porttitor.</td>
+                                       <td>29.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Two</td>
+                                       <td>Vis ac commodo adipiscing arcu aliquet.</td>
+                                       <td>19.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Three</td>
+                                       <td> Morbi faucibus arcu accumsan lorem.</td>
+                                       <td>29.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Four</td>
+                                       <td>Vitae integer tempus condimentum.</td>
+                                       <td>19.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Five</td>
+                                       <td>Ante turpis integer aliquet porttitor.</td>
+                                       <td>29.99</td>
+                                    </tr>
+                                 </tbody>
+                                 <tfoot>
+                                    <tr>
+                                       <td colspan="2"></td>
+                                       <td>100.00</td>
+                                    </tr>
+                                 </tfoot>
+                              </table>
+                           </div>
+
+                           <h4>Alternate</h4>
+                           <div class="table-wrapper">
+                              <table class="alt">
+                                 <thead>
+                                    <tr>
+                                       <th>Name</th>
+                                       <th>Description</th>
+                                       <th>Price</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <tr>
+                                       <td>Item One</td>
+                                       <td>Ante turpis integer aliquet porttitor.</td>
+                                       <td>29.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Two</td>
+                                       <td>Vis ac commodo adipiscing arcu aliquet.</td>
+                                       <td>19.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Three</td>
+                                       <td> Morbi faucibus arcu accumsan lorem.</td>
+                                       <td>29.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Four</td>
+                                       <td>Vitae integer tempus condimentum.</td>
+                                       <td>19.99</td>
+                                    </tr>
+                                    <tr>
+                                       <td>Item Five</td>
+                                       <td>Ante turpis integer aliquet porttitor.</td>
+                                       <td>29.99</td>
+                                    </tr>
+                                 </tbody>
+                                 <tfoot>
+                                    <tr>
+                                       <td colspan="2"></td>
+                                       <td>100.00</td>
+                                    </tr>
+                                 </tfoot>
+                              </table>
+                           </div>
+                        </section>
+
+                        <section>
+                           <h3 class="major">Buttons</h3>
+                           <ul class="actions">
+                              <li><a href="#" class="button primary">Primary</a></li>
+                              <li><a href="#" class="button">Default</a></li>
+                           </ul>
+                           <ul class="actions">
+                              <li><a href="#" class="button">Default</a></li>
+                              <li><a href="#" class="button small">Small</a></li>
+                           </ul>
+                           <ul class="actions">
+                              <li><a href="#" class="button primary icon solid fa-download">Icon</a></li>
+                              <li><a href="#" class="button icon solid fa-download">Icon</a></li>
+                           </ul>
+                           <ul class="actions">
+                              <li><span class="button primary disabled">Disabled</span></li>
+                              <li><span class="button disabled">Disabled</span></li>
+                           </ul>
+                        </section>
+
+                        <section>
+                           <h3 class="major">Form</h3>
+                           <form method="post" action="#">
+                              <div class="fields">
+                                 <div class="field half">
+                                    <label for="demo-name">Name</label>
+                                    <input type="text" name="demo-name" id="demo-name" value="" placeholder="Jane Doe" />
+                                 </div>
+                                 <div class="field half">
+                                    <label for="demo-email">Email</label>
+                                    <input type="email" name="demo-email" id="demo-email" value="" placeholder="jane@untitled.tld" />
+                                 </div>
+                                 <div class="field">
+                                    <label for="demo-category">Category</label>
+                                    <select name="demo-category" id="demo-category">
+                                       <option value="">-</option>
+                                       <option value="1">Manufacturing</option>
+                                       <option value="1">Shipping</option>
+                                       <option value="1">Administration</option>
+                                       <option value="1">Human Resources</option>
+                                    </select>
+                                 </div>
+                                 <div class="field half">
+                                    <input type="radio" id="demo-priority-low" name="demo-priority" checked>
+                                    <label for="demo-priority-low">Low</label>
+                                 </div>
+                                 <div class="field half">
+                                    <input type="radio" id="demo-priority-high" name="demo-priority">
+                                    <label for="demo-priority-high">High</label>
+                                 </div>
+                                 <div class="field half">
+                                    <input type="checkbox" id="demo-copy" name="demo-copy">
+                                    <label for="demo-copy">Email me a copy</label>
+                                 </div>
+                                 <div class="field half">
+                                    <input type="checkbox" id="demo-human" name="demo-human" checked>
+                                    <label for="demo-human">Not a robot</label>
+                                 </div>
+                                 <div class="field">
+                                    <label for="demo-message">Message</label>
+                                    <textarea name="demo-message" id="demo-message" placeholder="Enter your message" rows="6"></textarea>
+                                 </div>
+                              </div>
+                              <ul class="actions">
+                                 <li><input type="submit" value="Send Message" class="primary" /></li>
+                                 <li><input type="reset" value="Reset" /></li>
+                              </ul>
+                           </form>
+                        </section>
+
+                     </article>
+
+               </div>
+
+            <!-- Footer -->
+               <footer id="footer">
+                  <p class="copyright">&copy; 개발자: 김근영 박정윤 백인하 이영석 장현진</p>
+               </footer>
+
+         </div>
+
+      <!-- BG -->
+         <div id="bg"></div>
+
+      <!-- Scripts -->
+         <script src="assets/js/jquery.min.js"></script>
+         <script src="assets/js/browser.min.js"></script>
+         <script src="assets/js/breakpoints.min.js"></script>
+         <script src="assets/js/util.js"></script>
+         <script src="assets/js/main.js"></script>
+
+   </body>
+</html>
